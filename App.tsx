@@ -184,7 +184,7 @@ function App() {
       </main>
       
       <footer className="bg-white border-t border-gray-100 py-8 text-center text-gray-500 text-sm mb-20 md:mb-0">
-        <p>&copy; {new Date().getFullYear()} Lezzet Bulucu. Yapay zeka destekli tarif asistanı.</p>
+        <p>2026 Lezzet Bulucu 2.0. Yapay zeka destekli tarif asistanı.</p>
       </footer>
 
       {/* Modal */}
