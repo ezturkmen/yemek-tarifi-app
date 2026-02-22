@@ -8,6 +8,7 @@ interface RecipeDetailProps {
 }
 
 const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe, onClose }) => {
+  const [imageError, setImageError] = React.useState(false);
   const imageId = recipe.title.length % 50 + 50;
   const imageUrl = `https://picsum.photos/id/${imageId}/800/400`;
 
@@ -32,12 +33,19 @@ const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe, onClose }) => {
       
       <div className="relative bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slideUp">
         {/* Header Image */}
-        <div className="relative h-48 sm:h-64 flex-shrink-0">
-          <img 
-            src={imageUrl} 
-            alt={recipe.title} 
-            className="w-full h-full object-cover"
-          />
+        <div className="relative h-48 sm:h-64 flex-shrink-0 bg-gray-800">
+          {!imageError ? (
+            <img 
+              src={imageUrl} 
+              alt={recipe.title} 
+              className="w-full h-full object-cover"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-brand-500 to-orange-400 opacity-50">
+               <ChefHat size={64} className="text-white opacity-50" />
+            </div>
+          )}
           <button 
             onClick={onClose}
             className="absolute top-4 right-4 bg-white/90 p-2 rounded-full hover:bg-white text-gray-800 transition-colors shadow-lg"
