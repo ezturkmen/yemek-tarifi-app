@@ -8,6 +8,7 @@ interface RecipeCardProps {
 }
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
+  const [imageError, setImageError] = React.useState(false);
   const imageId = recipe.title.length % 50 + 50; 
   const imageUrl = `https://picsum.photos/id/${imageId}/400/300`;
   
@@ -29,12 +30,19 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
       onClick={onClick}
     >
       {/* Image Section */}
-      <div className="relative h-40 overflow-hidden">
-        <img 
-          src={imageUrl} 
-          alt={recipe.title} 
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
-        />
+      <div className="relative h-40 overflow-hidden bg-gray-200">
+        {!imageError ? (
+          <img 
+            src={imageUrl} 
+            alt={recipe.title} 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className={`w-full h-full flex items-center justify-center ${badgeColor} opacity-20`}>
+             <ChefHat size={40} className="text-gray-500 opacity-50" />
+          </div>
+        )}
         
         {/* Simple Category Badge */}
         <div className={`absolute top-0 left-0 px-3 py-1.5 rounded-br-xl text-[10px] font-bold text-white shadow-sm uppercase tracking-wider ${badgeColor}`}>
