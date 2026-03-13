@@ -103,20 +103,34 @@ function App() {
                  <button
                     onClick={handleSearch}
                     disabled={loading || selectedIngredients.length === 0}
-                    className="w-full py-4 bg-gray-900 hover:bg-black disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold rounded-2xl shadow-2xl shadow-gray-400/50 transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 text-lg border border-gray-700/50"
+                    className={`w-full py-4 font-bold rounded-2xl transition-all duration-500 flex items-center justify-center gap-3 text-lg relative overflow-hidden ${
+                      loading 
+                        ? 'bg-gradient-to-r from-brand-500 to-orange-500 text-white shadow-xl shadow-brand-500/40 border-transparent cursor-wait scale-[1.02]'
+                        : selectedIngredients.length === 0
+                          ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-brand-600 to-orange-500 hover:from-brand-500 hover:to-orange-400 text-white shadow-xl shadow-brand-500/30 hover:shadow-2xl hover:shadow-brand-500/50 transform hover:-translate-y-1 active:scale-[0.98] border-transparent'
+                    }`}
                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="animate-spin" />
-                        Menü Hazırlanıyor...
-                      </>
-                    ) : (
-                      <>
-                        <Search size={24} className="text-brand-400" />
-                        <span>{selectedIngredients.length} Malzeme ile Menü Oluştur</span>
-                        <ArrowRight size={20} className="opacity-70" />
-                      </>
+                    {loading && (
+                      <div className="absolute inset-0 bg-white/20 animate-pulse rounded-2xl"></div>
                     )}
+                    <div className="relative z-10 flex items-center justify-center gap-3">
+                      {loading ? (
+                        <>
+                          <div className="relative flex items-center justify-center">
+                             <Loader2 className="animate-spin text-white" size={26} />
+                             <ChefHat size={12} className="absolute text-white" />
+                          </div>
+                          <span className="tracking-wide font-medium text-white drop-shadow-sm">Şefin Özel Menüsü Hazırlanıyor...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Search size={24} className={selectedIngredients.length > 0 ? "text-white/90" : "text-gray-400"} />
+                          <span className="drop-shadow-sm">{selectedIngredients.length} Malzeme ile Menü Oluştur</span>
+                          <ArrowRight size={20} className="opacity-90" />
+                        </>
+                      )}
+                    </div>
                  </button>
                </div>
              </div>
@@ -184,7 +198,7 @@ function App() {
       </main>
       
       <footer className="bg-white border-t border-gray-100 py-8 text-center text-gray-500 text-sm mb-20 md:mb-0">
-        <p>2026 Lezzet Bulucu 2.0. Yapay zeka destekli tarif asistanı.</p>
+        <p>👨‍🍳 2026 | Lezzet Bulucu 2.1. Yapay zeka destekli tarif asistanı 👨‍🍳</p>
       </footer>
 
       {/* Modal */}
