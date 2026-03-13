@@ -8,10 +8,6 @@ interface RecipeDetailProps {
 }
 
 const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe, onClose }) => {
-  const [imageError, setImageError] = React.useState(false);
-  const imageId = recipe.title.length % 50 + 50;
-  const imageUrl = `https://picsum.photos/id/${imageId}/800/400`;
-
   // Helper to check if an ingredient is in the missing list
   const isMissing = (ing: string) => {
     return recipe.missingIngredients?.some(missing => ing.toLowerCase().includes(missing.toLowerCase()));
@@ -32,53 +28,40 @@ const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe, onClose }) => {
       ></div>
       
       <div className="relative bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slideUp">
-        {/* Header Image */}
-        <div className="relative h-48 sm:h-64 flex-shrink-0 bg-gray-800">
-          {!imageError ? (
-            <img 
-              src={imageUrl} 
-              alt={recipe.title} 
-              className="w-full h-full object-cover"
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-brand-500 to-orange-400 opacity-50">
-               <ChefHat size={64} className="text-white opacity-50" />
-            </div>
-          )}
+        {/* Header Section (No Image) */}
+        <div className="relative flex-shrink-0 bg-white border-b border-gray-100 p-6 sm:p-8 pt-12 sm:pt-12">
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 bg-white/90 p-2 rounded-full hover:bg-white text-gray-800 transition-colors shadow-lg"
+            className="absolute top-4 right-4 bg-gray-100 p-2 rounded-full hover:bg-gray-200 text-gray-800 transition-colors"
           >
             <X size={24} />
           </button>
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 sm:p-8">
-            <div className="flex flex-wrap gap-2 mb-2">
-                 <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-white text-xs font-semibold">
-                    <Globe size={12} />
-                    {recipe.sourceName || 'Web Kaynağı'}
-                </div>
-                {recipe.recipeCategory && (
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-500/80 backdrop-blur-md rounded-full text-white text-xs font-semibold">
-                        <Tag size={12} />
-                        {recipe.recipeCategory}
-                    </div>
-                )}
-            </div>
-           
-            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-2 shadow-sm">
-              {recipe.title}
-            </h2>
-            <div className="flex items-center gap-4 text-white/90 text-sm font-medium">
-              <span className="flex items-center gap-1 bg-white/20 px-3 py-1 rounded-full backdrop-blur-md">
-                <Clock size={16} />
-                {recipe.prepTime}
-              </span>
-              <span className="flex items-center gap-1 bg-white/20 px-3 py-1 rounded-full backdrop-blur-md">
-                <ChefHat size={16} />
-                {recipe.difficulty}
-              </span>
-            </div>
+          
+          <div className="flex flex-wrap gap-2 mb-4">
+               <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 rounded-full text-gray-700 text-xs font-semibold">
+                  <Globe size={12} />
+                  {recipe.sourceName || 'Web Kaynağı'}
+              </div>
+              {recipe.recipeCategory && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-50 text-brand-700 rounded-full text-xs font-semibold">
+                      <Tag size={12} />
+                      {recipe.recipeCategory}
+                  </div>
+              )}
+          </div>
+         
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-4">
+            {recipe.title}
+          </h2>
+          <div className="flex items-center gap-4 text-gray-600 text-sm font-medium">
+            <span className="flex items-center gap-1 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+              <Clock size={16} />
+              {recipe.prepTime}
+            </span>
+            <span className="flex items-center gap-1 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+              <ChefHat size={16} />
+              {recipe.difficulty}
+            </span>
           </div>
         </div>
 

@@ -46,6 +46,26 @@ const CATEGORY_ICONS: Record<IngredientCategory, React.ReactNode> = {
   'Kuruyemiş & Diğer': <Nut size={18} />
 };
 
+const INGREDIENT_EMOJIS: Record<string, string> = {
+  'Domates': '🍅', 'Salatalık': '🥒', 'Kuru Soğan': '🧅', 'Patates': '🥔', 'Sarımsak': '🧄', 'Biber (Yeşil)': '🫑', 'Biber (Kırmızı)': '🌶️', 
+  'Patlıcan': '🍆', 'Kabak': '🥒', 'Havuç': '🥕', 'Ispanak': '🍃', 'Maydanoz': '🌿', 'Dereotu': '🌿', 'Taze Soğan': '🧅', 'Marul': '🥬', 
+  'Limon': '🍋', 'Mantar': '🍄', 'Bezelye': '🫛', 'Fasulye (Taze)': '🫘', 'Karnabahar': '🥦', 'Brokoli': '🥦', 'Lahana': '🥬', 'Mısır': '🌽',
+  'Roka': '🌿', 'Nane': '🌿', 'Fesleğen': '🌿', 'Semizotu': '🌿', 'Pazı': '🥬', 'Enginar': '🪷', 'Kereviz': '🥬', 'Turp': '🫚', 'Elma': '🍎', 'Armut': '🍐', 
+  'Muz': '🍌', 'Çilek': '🍓', 'Portakal': '🍊', 'Mandalina': '🍊', 'Avokado': '🥑', 'Zencefil': '🫚',
+  'Kıyma': '🥩', 'Tavuk Göğsü': '🍗', 'Tavuk But': '🍗', 'Kuşbaşı Et': '🥩', 'Biftek': '🥩', 'Köfte': '🧆', 
+  'Sucuk': '🌭', 'Sosis': '🌭', 'Salam': '🥓', 'Pastırma': '🥓', 'Yumurta': '🥚', 'Ton Balığı': '🐟',
+  'Kuzu Eti': '🥩', 'Ciğer': '🥩', 'Hindi': '🦃', 'Somon': '🍣', 'Hamsi': '🐟',
+  'Pirinç': '🍚', 'Bulgur': '🌾', 'Makarna': '🍝', 'Mercimek (Kırmızı)': '🫘', 'Mercimek (Yeşil)': '🫘', 'Nohut': '🧆', 
+  'Kuru Fasulye': '🫘', 'Un': '🌾', 'Ekmek': '🍞', 'Galeta Unu': '🥖', 'İrmik': '🌾', 'Yufka': '🫓', 'Milföy Hamuru': '🥐', 'Şehriye': '🍝',
+  'Kuskus': '🍚', 'Erişte': '🍝', 'Yulaf': '🥣', 'Nişasta': '🌾',
+  'Süt': '🥛', 'Yoğurt': '🥣', 'Beyaz Peynir': '🧀', 'Kaşar Peyniri': '🧀', 'Tereyağı': '🧈', 'Margarin': '🧈', 'Krema': '🥛', 
+  'Zeytin': '🫒', 'Labne': '🧀', 'Lor Peyniri': '🧀', 'Kefir': '🥛', 'Cheddar': '🧀', 'Mozzarella': '🧀', 'Hellim': '🧀', 'Tulum Peyniri': '🧀',
+  'Ceviz': '🌰', 'Fındık': '🌰', 'Fıstık': '🥜', 'Badem': '🌰', 'Kuru Üzüm': '🍇', 'Kakao': '🍫', 'Çikolata': '🍫', 'Hindistan Cevizi': '🥥',
+  'Bal': '🍯', 'Pekmez': '🍯', 'Tahin': '🫙', 'Susam': '🌾', 'Çörek Otu': '🖤', 'Vanilya': '🌼', 'Kabartma Tozu': '🧂', 'Maya': '🍞', 
+  'Salça (Domates)': '🥫', 'Salça (Biber)': '🥫', 'Sıvı Yağ': '🛢️', 'Zeytinyağı': '🫒', 'Sirke': '🍾', 'Nar Ekşisi': '🏺',
+  'Tuz': '🧂', 'Karabiber': '🧂', 'Kekik': '🌿', 'Kimyon': '🧂', 'Pul Biber': '🌶️', 'Nane (Kuru)': '🌿'
+};
+
 const IngredientSelector: React.FC<IngredientSelectorProps> = ({ 
   selectedIngredients, 
   onToggleIngredient,
@@ -54,17 +74,44 @@ const IngredientSelector: React.FC<IngredientSelectorProps> = ({
   const [activeCategory, setActiveCategory] = useState<IngredientCategory>('Sebze & Meyve');
   const [customIngredient, setCustomIngredient] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [userAddedIngredients, setUserAddedIngredients] = useState<Record<IngredientCategory, string[]>>({
+    'Sebze & Meyve': [],
+    'Et & Şarküteri': [],
+    'Bakliyat & Tahıl': [],
+    'Süt & Kahvaltılık': [],
+    'Kuruyemiş & Diğer': []
+  });
 
   const handleAddCustom = (e: React.FormEvent) => {
     e.preventDefault();
-    if (customIngredient.trim()) {
-      onToggleIngredient(customIngredient.trim());
+    const trimmed = customIngredient.trim();
+    if (trimmed) {
+      const existsInCatalog = CATALOG[activeCategory].some(i => i.toLowerCase() === trimmed.toLowerCase());
+      const existsInUser = userAddedIngredients[activeCategory].some(i => i.toLowerCase() === trimmed.toLowerCase());
+      
+      let actualName = trimmed;
+      
+      if (!existsInCatalog && !existsInUser) {
+        setUserAddedIngredients(prev => ({
+          ...prev,
+          [activeCategory]: [...prev[activeCategory], trimmed]
+        }));
+      } else {
+        const found = CATALOG[activeCategory].find(i => i.toLowerCase() === trimmed.toLowerCase()) || 
+                      userAddedIngredients[activeCategory].find(i => i.toLowerCase() === trimmed.toLowerCase());
+        if (found) actualName = found;
+      }
+
+      if (!selectedIngredients.includes(actualName)) {
+        onToggleIngredient(actualName);
+      }
       setCustomIngredient('');
     }
   };
 
   // Filter ingredients based on search term
-  const filteredIngredients = CATALOG[activeCategory].filter(ing => 
+  const allCategoryIngredients = [...CATALOG[activeCategory], ...userAddedIngredients[activeCategory]];
+  const filteredIngredients = allCategoryIngredients.filter(ing => 
     ing.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -103,21 +150,34 @@ const IngredientSelector: React.FC<IngredientSelectorProps> = ({
 
       {/* Category Tabs */}
       <div className="flex overflow-x-auto pb-4 gap-2 mb-4 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
-        {(Object.keys(CATALOG) as IngredientCategory[]).map((cat) => (
+        {(Object.keys(CATALOG) as IngredientCategory[]).map((cat) => {
+          const allCatItems = [...CATALOG[cat], ...userAddedIngredients[cat]];
+          const selectedCount = allCatItems.filter(i => selectedIngredients.includes(i)).length;
+          const hasSelected = selectedCount > 0;
+          return (
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
             disabled={disabled}
             className={`flex items-center gap-2 px-4 py-3 rounded-xl font-medium text-sm whitespace-nowrap transition-all border-2 ${
               activeCategory === cat
-                ? 'bg-brand-50 border-brand-500 text-brand-700 shadow-sm'
-                : 'bg-white border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                ? 'bg-white border-brand-500 text-black shadow-sm'
+                : hasSelected
+                  ? 'bg-brand-50 border-brand-200 text-brand-700'
+                  : 'bg-white border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700'
             }`}
           >
-            {CATEGORY_ICONS[cat]}
+            <div className={hasSelected && activeCategory !== cat ? 'text-brand-500' : ''}>
+              {CATEGORY_ICONS[cat]}
+            </div>
             {cat}
+            {hasSelected && (
+              <span className="ml-1 bg-brand-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                {selectedCount}
+              </span>
+            )}
           </button>
-        ))}
+        )})}
       </div>
 
       {/* Ingredients Grid */}
@@ -126,7 +186,7 @@ const IngredientSelector: React.FC<IngredientSelectorProps> = ({
           {CATEGORY_ICONS[activeCategory]}
           {activeCategory}
           <span className="text-sm font-normal text-gray-400 ml-auto">
-             {CATALOG[activeCategory].filter(i => selectedIngredients.includes(i)).length} seçildi
+             {allCategoryIngredients.filter(i => selectedIngredients.includes(i)).length} seçildi
           </span>
         </h3>
         
@@ -138,16 +198,18 @@ const IngredientSelector: React.FC<IngredientSelectorProps> = ({
                 key={ingredient}
                 onClick={() => onToggleIngredient(ingredient)}
                 disabled={disabled}
-                className={`relative px-3 py-3 rounded-xl text-sm font-medium transition-all text-left flex items-center justify-between group ${
+                className={`relative px-4 py-3.5 rounded-2xl text-sm font-medium transition-all duration-300 text-left flex items-center justify-between group border-2 ${
                   isSelected
-                    ? 'bg-brand-500 text-white shadow-md shadow-brand-200 scale-[1.02]'
-                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                    ? 'bg-gradient-to-br from-brand-500 to-orange-400 border-transparent text-white shadow-lg shadow-brand-500/30 transform scale-[1.03]'
+                    : 'bg-white border-gray-100 text-gray-700 hover:border-brand-300 hover:shadow-md hover:-translate-y-0.5'
                 }`}
               >
-                <span className="truncate mr-2">{ingredient}</span>
+                <span className="truncate mr-2 drop-shadow-sm">
+                  {ingredient} {INGREDIENT_EMOJIS[ingredient] && <span className="ml-1">{INGREDIENT_EMOJIS[ingredient]}</span>}
+                </span>
                 {isSelected && (
-                  <div className="bg-white/20 rounded-full p-0.5 animate-fadeIn">
-                    <Check size={12} className="text-white" />
+                  <div className="bg-white/20 rounded-full p-1 animate-fadeIn">
+                    <Check size={14} className="text-white drop-shadow-sm" />
                   </div>
                 )}
               </button>
@@ -163,26 +225,22 @@ const IngredientSelector: React.FC<IngredientSelectorProps> = ({
       
       {/* Selection Summary (Mobile mainly) */}
       {selectedIngredients.length > 0 && (
-         <div className="mt-4 p-4 bg-gray-900 text-white rounded-2xl flex flex-wrap gap-2 shadow-lg">
-            <div className="w-full flex justify-between items-center mb-2">
-                <div className="text-sm">
-                    <span className="font-bold text-brand-400">{selectedIngredients.length}</span> malzeme seçildi.
+         <div className="mt-6 p-5 bg-white border border-gray-200 text-gray-800 rounded-3xl flex flex-col gap-3 shadow-sm">
+            <div className="w-full flex justify-between items-center border-b border-gray-100 pb-3">
+                <div className="text-sm font-medium flex items-center gap-2">
+                    <div className="bg-brand-100 text-brand-600 px-2.5 py-1 rounded-lg font-bold">{selectedIngredients.length}</div> 
+                    <span>Malzeme Seçildi</span>
                 </div>
-                <button 
-                  onClick={() => {
-                    // This would ideally clear selection, but prop doesn't support it yet.
-                    // We can implement a clear all if needed, but for now just show count.
-                  }}
-                  className="text-xs text-gray-400 hover:text-white"
-                >
-                  
-                </button>
             </div>
             <div className="flex flex-wrap gap-2">
                 {selectedIngredients.map(ing => (
-                    <span key={ing} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-800 rounded-lg text-xs border border-gray-700">
-                        {ing}
-                        <button onClick={() => onToggleIngredient(ing)} className="hover:text-red-400"><Plus size={12} className="rotate-45" /></button>
+                    <span 
+                      key={ing} 
+                      onClick={() => onToggleIngredient(ing)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-xl text-sm border border-gray-200 hover:border-red-200 hover:bg-red-50 hover:text-red-700 transition-colors group cursor-pointer shadow-sm"
+                    >
+                        {ing} {INGREDIENT_EMOJIS[ing] || ''}
+                        <Plus size={14} className="rotate-45 text-gray-400 group-hover:text-red-500 transition-colors" />
                     </span>
                 ))}
             </div>
